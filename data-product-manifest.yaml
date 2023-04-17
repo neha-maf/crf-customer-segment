@@ -38,7 +38,7 @@ stateManagement:
   updateStrategy: overwrite
   productStoreState:
     inferSchema: true
-    retentionVersions: "10"
+  retentionVersions: "10"
   updateStrategyOptions:
       uniqueKeyColumns:
         - crf_customer_segment_hash_id
