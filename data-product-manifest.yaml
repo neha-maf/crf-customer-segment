@@ -1,0 +1,54 @@
+version: 0.0.1
+discoveryPort:
+  name: Maf XConnect Customer Segments
+  description: Maf XConnect Customer Segment
+  category: audience
+  image: http://google.com
+  autofillUserinfo: true
+  tags: []
+  extra: {}
+inputPorts:
+  - alias: s3_maf_xconnect_crf_customer_segment
+    description: XConnect CRF Customer Segment
+    tags: []
+    extra: {}
+    syncType: pull
+    type: 's3'
+    sourceUrn: urn:dv:datasource:8bd4b8e5-7385-4252-a571-3e2378425e80
+    entityId:
+      alias: 's3_maf_xconnect_crf_customer_segment'
+      createEntity: true
+      entityName: F_CUSTOMER_SEGMENT_
+      type: 's3-bucket'
+      entityPath: "s3a://mafh-analytics-data-ingestion/data-ingestion/prd/parsed/rtl_crf_dim_customer_segment/*/F_CUSTOMER_SEGMENT_*.txt"
+      filter: ""
+      fileFormat: 'csv'
+      delimiter: "|"
+      header: true
+      inferSchema: true
+      processingTimeColumn:
+        - processing_date
+      actualTimeColumn:
+        - processing_date
+      projection:
+        - '*'
+stateManagement:
+  alias: 'maf_xconnect_crf_customer_segment_segment'
+  refreshInterval: 00 10 * * *
+  updateStrategy: overwrite
+  productStoreState:
+    inferSchema: true
+    retentionVersions: "10"
+  updateStrategyOptions:
+      uniqueKeyColumns:
+        - crf_customer_segment_hash_id
+      changeTrackColumns:
+        - nothing
+transformation:
+    sql: SELECT * FROM s3_maf_xconnect_crf_customer_segment
+outputPort:
+  channels:
+    - channelType: REST-API
+      queryType: SQL
+    - channelType: JDBC
+      queryType: SQL
