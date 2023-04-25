@@ -1,6 +1,6 @@
 version: 0.0.1
 discoveryPort:
-  name: Maf XConnect Customer Segments
+  name: MAF XConnect Customer Segments latest
   description: Maf XConnect Customer Segment
   category: audience
   image: http://google.com
@@ -14,7 +14,7 @@ inputPorts:
     extra: {}
     syncType: pull
     type: 's3'
-    sourceUrn: urn:dv:datasource:1748bfeb-7453-4844-8123-f2775a999046
+    sourceUrn: urn:dv:datasource:8bd4b8e5-7385-4252-a571-3e2378425e80
     entityId:
       alias: 's3_maf_xconnect_crf_customer_segment'
       createEntity: true
@@ -34,10 +34,10 @@ inputPorts:
         - '*'
 stateManagement:
   alias: 'maf_xconnect_crf_customer_segment_segment'
-  refreshInterval: 00 10 * * *
+  refreshInterval: 00 8 * * *
   updateStrategy: overwrite
   productStoreState:
-    inferSchema: true
+    logicalSchemaUrn: urn:dv:schema:4b44a747-f0a2-4446-b2aa-dedfc33690be
   retentionVersions: "10"
   updateStrategyOptions:
       uniqueKeyColumns:
