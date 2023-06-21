@@ -1,54 +1,67 @@
-version: 0.0.1
+version: 0.1.0
+alias: MAF_Customer_Segment
 discoveryPort:
-  name: MAF XConnect Customer Segments latest
-  description: Maf XConnect Customer Segment
-  category: audience
-  image: http://google.com
-  autofillUserinfo: true
-  tags: []
-  extra: {}
+  name: MAF Customer Segments
+  shortDescription: This is Maf XConnect Customer Segment manifest
+  longDescription: This is Maf XConnect Customer Segment manifest
+  tags:
+    - MAF Data
+    - Schedule Run
+    - XConnect
+    - Customer
+  domain: ['Customer']
+  function: ['Forecast']
+  regulatoryFields:
+    dataPrivacy: public
+    customerInfo: nonPII
+    dataOrigin: machineGenerated
+    monetaryInfo: nonFinancialData
 inputPorts:
   - alias: s3_maf_xconnect_crf_customer_segment
     description: XConnect CRF Customer Segment
-    tags: []
-    extra: {}
+    type: s3-csv
     syncType: pull
-    type: 's3'
-    sourceUrn: urn:dv:datasource:8bd4b8e5-7385-4252-a571-3e2378425e80
-    entityId:
-      alias: 's3_maf_xconnect_crf_customer_segment'
-      createEntity: true
-      entityName: F_CUSTOMER_SEGMENT_
-      type: 's3-bucket'
-      entityPath: "s3a://mafh-analytics-data-ingestion/data-ingestion/prd/parsed/rtl_crf_dim_customer_segment/*/F_CUSTOMER_SEGMENT_*.txt"
+    connectionUrn: urn:dv:connection:1c3b83a3-4bad-4477-9eb6-69cd34de4e3f
+    dataSet:
+      path: s3a://mafh-analytics-data-ingestion/data-ingestion/prd/parsed/rtl_crf_dim_customer_segment/*/F_CUSTOMER_SEGMENT_*.txt
+      advanceOptions:
+        delimiter: '|'
+        header: true
+        inferSchema: true
       filter: ""
-      fileFormat: 'csv'
-      delimiter: "|"
-      header: true
-      inferSchema: true
-      processingTimeColumn:
-        - processing_date
-      actualTimeColumn:
-        - processing_date
       projection:
         - '*'
-stateManagement:
-  alias: 'maf_xconnect_crf_customer_segment_segment'
-  refreshInterval: 00 8 * * *
+productState:
+  updateType: 'scheduled'
+  updateSchedule: "30 5 * * *"
   updateStrategy: overwrite
-  productStoreState:
-    logicalSchemaUrn: urn:dv:schema:4b44a747-f0a2-4446-b2aa-dedfc33690be
-  retentionVersions: "10"
+  logicalSchemaUrn: urn:dv:schema:4b44a747-f0a2-4446-b2aa-dedfc33690be
   updateStrategyOptions:
-      uniqueKeyColumns:
+    uniqueKeyColumns:
         - crf_customer_segment_hash_id
-      changeTrackColumns:
+    changeTrackColumns:
         - nothing
 transformation:
-    sql: SELECT * FROM s3_maf_xconnect_crf_customer_segment
+  - alias: s3_maf_xconnect_crf
+    description: step_1
+    type: sql
+    sequenceNo: 1
+    query: SELECT * FROM s3_maf_xconnect_crf_customer_segment
+    references:
+      - alias: s3_maf_xconnect_crf_customer_segment
+        sqlReference: s3_maf_xconnect_crf_customer_segment
 outputPort:
-  channels:
-    - channelType: REST-API
-      queryType: SQL
-    - channelType: JDBC
-      queryType: SQL
+  subscriptionChannels:
+    - channelType: rest-api
+      queryType: sql
+controlPort:
+  dataQualityRules:
+    RecordCountCheck:
+      inputPort:
+        - referenceAlias: s3_maf_xconnect_crf_customer_segment
+          expression: ">="
+          number: 100
+      productState:
+        referenceAlias: s3_maf_xconnect_crf_customer_segment
+        expression: ==
+        number: 100
